@@ -1,6 +1,7 @@
 #include <iostream>
 #include <fstream>
 #include <conio.h>
+#include <vector>
 #include "Graph.h"
 /*
 9. Напишите программу, которая будет находить Эйлеров путь в графе. 
@@ -26,50 +27,90 @@ int main()
         << "\n\t-> Файл: CoupleListsForADirectedGraph.txt \t\t-> Списки пар для ориентированного графа \t\t- 5;"
         << "\n\t-> Файл: CoupleListsForAnUndirectedGraph.txt \t\t-> Списки пар для неориентированного графа \t\t- 6;"
         << "\n\t-> Файл: AdjacencyListsForADirectedGraph.txt \t\t-> Списки смежности для ориентированного графа \t\t- 7;"
-        << "\n\t-> Файл: AdjacencyListsForAnUndirectedGraph.txt \t-> Списки смежности для геориентированного графа \t- 8.";
+        << "\n\t-> Файл: AdjacencyListsForAnUndirectedGraph.txt \t-> Списки смежности для неориентированного графа \t- 8.";
 
-    char choice = getSymbol({ '1','2','3','4','5','6','7','8' }, "\nВыберите способ задания графа:\n->");
-    int numberOfVertices, numberOfEdges;
+    char choice = getSymbol({ '1','2','3','4','5','6','7','8' }, "\n\n\tВыберите способ задания графа:\n->");
+    int numberOfVertices, // количество вершин
+        numberOfEdges;    // количество рёбер/дуг
     std::ifstream fin;
+    std::vector<ListNode<int>> AdjacencyLists;
+   
+   
 
     switch (choice)
     {
     case '1':// Матрица инциденций для ориентированного графа
+    {
+        fin.open("IncidentMatrixForADirectedGraph.txt");
+        fin >> numberOfVertices >> numberOfEdges;
+        int* matrix = new int[numberOfVertices * numberOfEdges];
+        for (unsigned i = 0; i < numberOfVertices * numberOfEdges; i++)
+            fin >> matrix[i];
+
+        for (unsigned i = 0; i < numberOfVertices; i++)
+        {
+            AdjacencyLists.push_back(ListNode<int>(i+1));
+            for (unsigned j = 0; j < numberOfEdges; j++)
+                if (matrix[i * numberOfEdges + j] == 1)
+                    for (unsigned k = 0; k < numberOfVertices; k++)
+                        if (matrix[k * numberOfEdges + j] == -1)
+                        {
+                            AdjacencyLists[i].append(k+1);
+                            break;
+                        }
+            
+        }
+        delete matrix;
+        for (auto& element : AdjacencyLists)
+            std::cout << element; 
+
+
+        break;
+    }
     case '2':// Матрица инциденций для неориентированного графа
     {
-        if (choice == '1') fin.open("IncidentMatrixForADirectedGraph.txt");
-        else fin.open("IncidentMatrixForAnUndirectedGraph.txt");
+        fin.open("IncidentMatrixForAnUndirectedGraph.txt");
+        fin >> numberOfVertices >> numberOfEdges;
+        int* matrix = new int[numberOfVertices * numberOfEdges];
+        for (unsigned i = 0; i < numberOfVertices * numberOfEdges; i++)
+            fin >> matrix[i];
 
+        for (unsigned i = 0; i < numberOfVertices; i++)
+        {
+            AdjacencyLists.push_back(ListNode<int>(i + 1));
+            for (unsigned j = 0; j < numberOfEdges; j++)
+                if (matrix[i * numberOfEdges + j] == 1)
+                    for (unsigned k = 0; k < numberOfVertices; k++)
+                        if (matrix[k * numberOfEdges + j] == 1 && k != i)
+                        {
+                            AdjacencyLists[i].append(k + 1);
+                            break;
+                        }
 
+        }
+        delete matrix;
+        for (auto& element : AdjacencyLists)
+            std::cout << element;
         break;
     }
     case '3'://Матрица смежности для ориентированного графа
+        fin.open("AdjacencyMatrixForADirectedGraph.txt");
+        break;
     case '4'://Матрица смежности для неориентированного графа
-    {   
-        if (choice == '3') fin.open("AdjacencyMatrixForADirectedGraph.txt");
-        else               fin.open("AdjacencyMatrixForAnUndirectedGraph.txt");
-
-
+        fin.open("AdjacencyMatrixForAnUndirectedGraph.txt");
         break;
-    }
     case '5'://Списки пар для ориентированного графа
+        fin.open("CoupleListsForADirectedGraph.txt");
+        break;
     case '6'://Списки пар для неориентированного графа
-    {    
-        if (choice == '5') fin.open("CoupleListsForADirectedGraph.txt");
-        else               fin.open("CoupleListsForAnUndirectedGraph.txt");
-
-
+        fin.open("CoupleListsForAnUndirectedGraph.txt");
         break;
-    }
     case '7'://Списки смежности для ориентированного графа
-    case '8'://Списки смежности для геориентированного графа
-    {    
-        if (choice == '7') fin.open("AdjacencyListsForADirectedGraph.txt");
-        else               fin.open("AdjacencyListsForAnUndirectedGraph.txt");
-
-            
+        fin.open("AdjacencyListsForADirectedGraph.txt");
         break;
-    }
+    case '8'://Списки смежности для неориентированного графа
+        fin.open("AdjacencyListsForAnUndirectedGraph.txt");
+        break;
     default: std::cerr << "\n\t\t\tУпс, что-то пошло не так...";
     }
 
@@ -80,8 +121,10 @@ int main()
     }
     else std::cerr << "Ошибка открытия файла.";
 
+    
+   
+   // Graph<int> Graph();
 
-    Graph<int> Graph();
 }
 
 char getSymbol(std::initializer_list<char> list,
