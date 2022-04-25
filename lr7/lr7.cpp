@@ -35,138 +35,108 @@ int main()
     std::ifstream fin;
     std::vector<ListNode<int>> AdjacencyLists;
    
-    switch (choice)
+    // Открытие файла
+    switch (choice) 
     {
     case '1':// Матрица инциденций для ориентированного графа
-    {
         fin.open("IncidentMatrixForADirectedGraph.txt");
-        fin >> numberOfVertices >> numberOfEdges;
-        int* matrix = new int[numberOfVertices * numberOfEdges];
-        for (unsigned i = 0; i < numberOfVertices * numberOfEdges; i++)
-            fin >> matrix[i];
-
-        for (unsigned i = 0; i < numberOfVertices; i++)
-        {
-            AdjacencyLists.push_back(ListNode<int>(i+1));
-            for (unsigned j = 0; j < numberOfEdges; j++)
-                if (matrix[i * numberOfEdges + j] == 1)
-                    for (unsigned k = 0; k < numberOfVertices; k++)
-                        if (matrix[k * numberOfEdges + j] == -1)
-                        {
-                            AdjacencyLists[i].append(k+1);
-                            break;
-                        }
-        }
-        delete[] matrix;
         break;
-    }
     case '2':// Матрица инциденций для неориентированного графа
-    {
         fin.open("IncidentMatrixForAnUndirectedGraph.txt");
-        fin >> numberOfVertices >> numberOfEdges;
-        int* matrix = new int[numberOfVertices * numberOfEdges];
-        for (unsigned i = 0; i < numberOfVertices * numberOfEdges; i++)
-            fin >> matrix[i];
-
-        for (unsigned i = 0; i < numberOfVertices; i++)
-        {
-            AdjacencyLists.push_back(ListNode<int>(i + 1));
-            for (unsigned j = 0; j < numberOfEdges; j++)
-                if (matrix[i * numberOfEdges + j] == 1)
-                    for (unsigned k = 0; k < numberOfVertices; k++)
-                        if (matrix[k * numberOfEdges + j] == 1 && k != i)
-                        {
-                            AdjacencyLists[i].append(k + 1);
-                            break;
-                        }
-
-        }
-        delete[] matrix;
         break;
-    }
     case '3'://Матрица смежности для ориентированного графа
-    {
         fin.open("AdjacencyMatrixForADirectedGraph.txt");
-        fin >> numberOfVertices >> numberOfEdges;
-        int* matrix = new int[numberOfVertices * numberOfVertices];
-        for (unsigned i = 0; i < numberOfVertices * numberOfVertices; i++)
-            fin >> matrix[i];
-
-        for (unsigned i = 0; i < numberOfVertices; i++)
-        {
-            AdjacencyLists.push_back(ListNode<int>(i + 1));
-            for (unsigned j = 0; j < numberOfVertices; j++)
-                if (matrix[i * numberOfVertices + j] == 1)
-                    AdjacencyLists[i].append(j + 1);
-        }
-        delete[] matrix;
         break;
-    }
     case '4'://Матрица смежности для неориентированного графа
-    {   
         fin.open("AdjacencyMatrixForAnUndirectedGraph.txt");
-        fin >> numberOfVertices >> numberOfEdges;
-        int* matrix = new int[numberOfVertices * numberOfVertices];
-        for (unsigned i = 0; i < numberOfVertices * numberOfVertices; i++)
-            fin >> matrix[i];
-
-        for (unsigned i = 0; i < numberOfVertices; i++)
-        {
-            AdjacencyLists.push_back(ListNode<int>(i + 1));
-            for (unsigned j = 0; j < numberOfVertices; j++)
-                if (matrix[i * numberOfVertices + j] == 1)
-                    AdjacencyLists[i].append(j + 1);
-        }
-        delete[] matrix;
         break;
-    }
     case '5'://Списки пар для ориентированного графа
         fin.open("CoupleListsForADirectedGraph.txt");
-        fin >> numberOfVertices >> numberOfEdges;
-        for (unsigned i = 0; i < numberOfVertices; i++)
-            AdjacencyLists.push_back(ListNode<int>(i + 1));
-        
-        for (unsigned i = 0; i < numberOfEdges; i++)
-        {
-            unsigned index, vertex;
-            fin >> index >> vertex;
-            AdjacencyLists[index-1].append(vertex);
-        }   
-           
         break;
     case '6'://Списки пар для неориентированного графа
         fin.open("CoupleListsForAnUndirectedGraph.txt");
-        fin >> numberOfVertices >> numberOfEdges;
+        break;
+    case '7'://Списки смежности для ориентированного графа
+        fin.open("AdjacencyListsForADirectedGraph.txt");
+        break;
+    case '8'://Списки смежности для неориентированного графа
+        fin.open("AdjacencyListsForAnUndirectedGraph.txt");
+        break;
+    }
+    fin >> numberOfVertices >> numberOfEdges;
+    switch (choice)
+    {
+    case '1':case '2':case '3':case '4':
+    {
+        int* matrix; 
+        if (choice == '1' || choice == '2') 
+        {
+            matrix = new int[numberOfVertices * numberOfEdges];
+            for (unsigned i = 0; i < numberOfVertices * numberOfEdges; i++)
+                fin >> matrix[i];
+
+            if(choice == '1')   // Матрица инциденций для ориентированного графа
+                for (unsigned i = 0; i < numberOfVertices; i++)
+                {
+                    AdjacencyLists.push_back(ListNode<int>(i + 1));
+                    for (unsigned j = 0; j < numberOfEdges; j++)
+                        if (matrix[i * numberOfEdges + j] == 1)
+                            for (unsigned k = 0; k < numberOfVertices; k++)
+                                if (matrix[k * numberOfEdges + j] == -1)
+                                {
+                                    AdjacencyLists[i].append(k + 1);
+                                    break;
+                                }
+                }
+            else                // Матрица инциденций для неориентированного графа
+                for (unsigned i = 0; i < numberOfVertices; i++)
+                {
+                    AdjacencyLists.push_back(ListNode<int>(i + 1));
+                    for (unsigned j = 0; j < numberOfEdges; j++)
+                        if (matrix[i * numberOfEdges + j] == 1)
+                            for (unsigned k = 0; k < numberOfVertices; k++)
+                                if (matrix[k * numberOfEdges + j] == 1 && k != i)
+                                {
+                                    AdjacencyLists[i].append(k + 1);
+                                    break;
+                                }
+                }
+        }
+        else                    // Матрица смежности для (не)ориентированного графа
+        {
+            matrix = new int[numberOfVertices * numberOfVertices];
+            for (unsigned i = 0; i < numberOfVertices * numberOfVertices; i++)
+                fin >> matrix[i];
+
+            for (unsigned i = 0; i < numberOfVertices; i++)
+            {
+                AdjacencyLists.push_back(ListNode<int>(i + 1));
+                for (unsigned j = 0; j < numberOfVertices; j++)
+                    if (matrix[i * numberOfVertices + j] == 1)
+                        AdjacencyLists[i].append(j + 1);
+            }
+        }
+        delete[] matrix;
+        break;
+    }
+    case '5': case '6':         // Списки пар для ориентированного графа
+        
         for (unsigned i = 0; i < numberOfVertices; i++)
             AdjacencyLists.push_back(ListNode<int>(i + 1));
-
+        
         for (unsigned i = 0; i < numberOfEdges; i++)
         {
             unsigned index, vertex;
             fin >> index >> vertex;
             AdjacencyLists[index-1].append(vertex);
-            AdjacencyLists[vertex-1].append(index );
-        }
-
-        
+            if(choice == '6')
+                AdjacencyLists[vertex - 1].append(index); // Симметричная пара для неориентированного графа
+        }   
+           
         break;
-    case '7'://Списки смежности для ориентированного графа
-        fin.open("AdjacencyListsForADirectedGraph.txt");
-        fin >> numberOfVertices;
+    
+    case '7':case '8':           // Списки смежности для (не)ориентированного графа
         for(unsigned i = 0; i < numberOfVertices; i++)
-        {
-            unsigned index, vertex;
-            fin >> index;
-            AdjacencyLists.push_back(ListNode<int>(index));
-            while (fin >> vertex && vertex != 0)
-                AdjacencyLists[index - 1].append(vertex);
-        }
-        
-        break;
-    case '8'://Списки смежности для неориентированного графа
-        fin.open("AdjacencyListsForAnUndirectedGraph.txt");
-        fin >> numberOfVertices;
-        for (unsigned i = 0; i < numberOfVertices; i++)
         {
             unsigned index, vertex;
             fin >> index;
@@ -178,6 +148,7 @@ int main()
     default: std::cerr << "\n\t\t\tУпс, что-то пошло не так...";
     }
 
+
     if (fin)
     {
         for (auto& element : AdjacencyLists)
@@ -188,7 +159,7 @@ int main()
     
    
    // Graph<int> Graph();
-
+    return 0;
 }
 
 char getSymbol(std::initializer_list<char> list,
