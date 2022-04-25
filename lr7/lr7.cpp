@@ -35,8 +35,6 @@ int main()
     std::ifstream fin;
     std::vector<ListNode<int>> AdjacencyLists;
    
-   
-
     switch (choice)
     {
     case '1':// Матрица инциденций для ориентированного графа
@@ -58,13 +56,8 @@ int main()
                             AdjacencyLists[i].append(k+1);
                             break;
                         }
-            
         }
-        delete matrix;
-        for (auto& element : AdjacencyLists)
-            std::cout << element; 
-
-
+        delete[] matrix;
         break;
     }
     case '2':// Матрица инциденций для неориентированного графа
@@ -88,36 +81,107 @@ int main()
                         }
 
         }
-        delete matrix;
-        for (auto& element : AdjacencyLists)
-            std::cout << element;
+        delete[] matrix;
         break;
     }
     case '3'://Матрица смежности для ориентированного графа
+    {
         fin.open("AdjacencyMatrixForADirectedGraph.txt");
+        fin >> numberOfVertices >> numberOfEdges;
+        int* matrix = new int[numberOfVertices * numberOfVertices];
+        for (unsigned i = 0; i < numberOfVertices * numberOfVertices; i++)
+            fin >> matrix[i];
+
+        for (unsigned i = 0; i < numberOfVertices; i++)
+        {
+            AdjacencyLists.push_back(ListNode<int>(i + 1));
+            for (unsigned j = 0; j < numberOfVertices; j++)
+                if (matrix[i * numberOfVertices + j] == 1)
+                    AdjacencyLists[i].append(j + 1);
+        }
+        delete[] matrix;
         break;
+    }
     case '4'://Матрица смежности для неориентированного графа
+    {   
         fin.open("AdjacencyMatrixForAnUndirectedGraph.txt");
+        fin >> numberOfVertices >> numberOfEdges;
+        int* matrix = new int[numberOfVertices * numberOfVertices];
+        for (unsigned i = 0; i < numberOfVertices * numberOfVertices; i++)
+            fin >> matrix[i];
+
+        for (unsigned i = 0; i < numberOfVertices; i++)
+        {
+            AdjacencyLists.push_back(ListNode<int>(i + 1));
+            for (unsigned j = 0; j < numberOfVertices; j++)
+                if (matrix[i * numberOfVertices + j] == 1)
+                    AdjacencyLists[i].append(j + 1);
+        }
+        delete[] matrix;
         break;
+    }
     case '5'://Списки пар для ориентированного графа
         fin.open("CoupleListsForADirectedGraph.txt");
+        fin >> numberOfVertices >> numberOfEdges;
+        for (unsigned i = 0; i < numberOfVertices; i++)
+            AdjacencyLists.push_back(ListNode<int>(i + 1));
+        
+        for (unsigned i = 0; i < numberOfEdges; i++)
+        {
+            unsigned index, vertex;
+            fin >> index >> vertex;
+            AdjacencyLists[index-1].append(vertex);
+        }   
+           
         break;
     case '6'://Списки пар для неориентированного графа
         fin.open("CoupleListsForAnUndirectedGraph.txt");
+        fin >> numberOfVertices >> numberOfEdges;
+        for (unsigned i = 0; i < numberOfVertices; i++)
+            AdjacencyLists.push_back(ListNode<int>(i + 1));
+
+        for (unsigned i = 0; i < numberOfEdges; i++)
+        {
+            unsigned index, vertex;
+            fin >> index >> vertex;
+            AdjacencyLists[index-1].append(vertex);
+            AdjacencyLists[vertex-1].append(index );
+        }
+
+        
         break;
     case '7'://Списки смежности для ориентированного графа
         fin.open("AdjacencyListsForADirectedGraph.txt");
+        fin >> numberOfVertices;
+        for(unsigned i = 0; i < numberOfVertices; i++)
+        {
+            unsigned index, vertex;
+            fin >> index;
+            AdjacencyLists.push_back(ListNode<int>(index));
+            while (fin >> vertex && vertex != 0)
+                AdjacencyLists[index - 1].append(vertex);
+        }
+        
         break;
     case '8'://Списки смежности для неориентированного графа
         fin.open("AdjacencyListsForAnUndirectedGraph.txt");
+        fin >> numberOfVertices;
+        for (unsigned i = 0; i < numberOfVertices; i++)
+        {
+            unsigned index, vertex;
+            fin >> index;
+            AdjacencyLists.push_back(ListNode<int>(index));
+            while (fin >> vertex && vertex != 0)
+                AdjacencyLists[index - 1].append(vertex);
+        }
         break;
     default: std::cerr << "\n\t\t\tУпс, что-то пошло не так...";
     }
 
     if (fin)
     {
-
-
+        for (auto& element : AdjacencyLists)
+            std::cout << element;
     }
     else std::cerr << "Ошибка открытия файла.";
 
