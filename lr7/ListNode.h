@@ -8,73 +8,102 @@ namespace luzinsan
 	class ListNode
 	{
 	private:
-		T l_info;        // информационное поле
-		ListNode* l_next; // ссылка на следующий элемент списка
-		ListNode* BeginList; // указатель на начало кольцевого списка
-		
+		T* _info;              // информационное поле
+		ListNode<T>* _next;    // следующий элемент списка
+		ListNode<T>* _endList; // конец списка
 	public:
-		ListNode* getBeginList();
-		ListNode* getNext();
-		ListNode(); // инициализация списка - первого фиктивного элемента
+		ListNode* getNext() { return _next; }
+		ListNode() : _info{ NULL }, _next{ NULL } { }
+		ListNode(T info) : _info{new T}, _next { NULL }, _endList{ NULL }
+		{ 
+			*_info = info;
+		}
+
+		ListNode(const ListNode<T>& List) 
+			: ListNode<T>()
+		{
+			const ListNode<T>*  temp = &List;
+
+			while (temp != NULL)
+			{
+				append(*(temp->_info));
+				temp = temp->_next;
+			}
+		}
+
+		~ListNode()
+		{
+			while (this->_next != NULL)
+				deleteNode(this);
+			delete _info;
+		}
+
+		// Вставка в конец списка
+		ListNode* append(T item)
+		{
+			ListNode<T>* currentItem = new ListNode<T>(item);
+			
+			if (!_info)
+			{
+				*this = *currentItem;
+				_endList = this;
+			}
+			else
+			{
+				_endList->_next = currentItem; // добавляем после последнего элемента в списке новый элемент
+				_endList = _endList->_next;    // перемещаем указатель на новый последний элемент в списке
+			}
+			return this;
+		}
+
 
 		// Вставка нового элемента списка после текущего, либо вставка первого элемента в начало
-		ListNode* InsertNode(ListNode* p, T i);
+		ListNode* insert(ListNode<T>* p, T i)
+		{
+			ListNode<T>* q = new ListNode<T>;
+			assert(q && "Память не выделилась!!!");
+			q->l_info = i;
+			if (!p) // если список ещё не заполнен ни одним элементом
+				p = q;
+			else
+			{
+				q->l_next = p->l_next;
+				p->l_next = q;
+			}
+			return this;
+		}
 
 		//Удаление следующего элемента после текущего
-		T DeleteNode(ListNode* p);
+		T deleteNode(ListNode<T>* p)
+		{
+			T val = *(p->_next->_info);
+			delete p->_next->_info;
+			p->_next = p->_next->_next;
+			return val;
+		}
 
 		// Печать элементов списка
-		ListNode* PrintList(ListNode* p);
+		friend std::ostream& operator<<(std::ostream& out, const ListNode<T>& node)
+		{
+			const ListNode<T>* temp = &node;
+			std::cout << "Список:\n";
+			do
+			{
+				std::cout << *(temp->_info) << ' ';
+				temp = temp->_next;
+			} while (temp != NULL);
+			std::cout << "\n";
+			return out;
+		}
 
-		~ListNode(); // уничтожение списка
+		const ListNode<T>& operator=(T item) 
+		{
+			if (!_info)
+				_info = new T;
+			*_info = item;
+			return *this;
+		}
+
 	};
 
-
-	template <class T> ListNode<T>* ListNode<T>::getBeginList() { return BeginList; }
-	template <class T> ListNode<T>* ListNode<T>::getNext() { return l_next; }
-	template <class T> ListNode<T>::ListNode() : l_info{ 0 }, l_next{ nullptr }
-	{
-	}
-	template <class T> ListNode<T>::~ListNode()
-	{
-		while (BeginList != BeginList->l_next)
-			DeleteNode(BeginList);
-		delete[] BeginList;
-	}
-
-	template <class T> ListNode<T>* ListNode<T>::InsertNode(ListNode<T>* p, T i)
-	{
-		ListNode* q = new ListNode;
-		assert(q && "Память не выделилась!!!");
-		q->l_info = i;
-		if (!p) // если список ещё не заполнен ни одним элементом
-			p = q;
-		else
-		{
-			q->l_next = p->l_next;
-			p->l_next = q;
-		}
-		return this;
-	}
-
-	template <class T> T ListNode<T>::DeleteNode(ListNode<T>* p)
-	{
-		ListNode* q = p->l_next;
-		int val = q->l_info;
-		p->l_next = q->l_next;
-		delete q;
-		return val;
-	}
-
-	template <class T> ListNode<T>* ListNode<T>::PrintList(ListNode<T>* p)
-	{
-		std::cout << "Список:\n";
-		do
-		{
-			std::cout << p->l_info << ' ';
-			p = p->l_next;
-		} while (p != BeginList);
-		std::cout << "\n";
-		return this;
-	}
 }
