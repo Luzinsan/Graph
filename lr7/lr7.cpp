@@ -151,6 +151,7 @@ int main()
 
     if (fin)
     {
+        std::cout << "\n\t—формированный список смежностей:\n";
         for (auto& element : AdjacencyLists)
             std::cout << element;
     }
@@ -158,7 +159,7 @@ int main()
 
     
    
-   // Graph<int> Graph();
+    Graph<int> Graph(AdjacencyLists);
     return 0;
 }
 
