@@ -51,6 +51,7 @@ namespace luzinsan
 			else
 			{
 				_endList->_next = currentItem; // добавляем после последнего элемента в списке новый элемент
+				//currentItem->_endList = _endList->_next;
 				_endList = _endList->_next;    // перемещаем указатель на новый последний элемент в списке
 			}
 			return this;
