@@ -48,7 +48,6 @@ namespace luzinsan
 				Stack<T>::print(std::cout, stack1);
 				std::cout << "\nStack #2:\t";
 				Stack<T>::print(std::cout, stack2);
-
 			}
 		}
 	};
