@@ -1,4 +1,5 @@
 #pragma once
+#include <iostream>
 
 namespace luzinsan 
 {
@@ -18,8 +19,11 @@ namespace luzinsan
         size_t size;
     public:
         Stack() : base(NULL), size(0) {}
-
         virtual ~Stack() {  clear(); }
+
+        bool isEmpty() const { return !base; }
+        size_t getSize() const { return size; }
+        const T& getHead() const { return base->value; }
 
         void pop() 
         {
@@ -36,8 +40,6 @@ namespace luzinsan
             return base->value;
         }
 
-        const T& getHead() const { return base->value; }
-
         void clear() 
         {
             while (!isEmpty()) 
@@ -45,9 +47,28 @@ namespace luzinsan
             size = 0;
         }
 
-        bool isEmpty() const { return !base;  }
-        size_t getSize() const { return size; }
-    
+        // Печать элементов списка
+        static std::ostream& print(std::ostream& out, Stack<T>& stack)
+        {
+            if (stack.getSize())
+            {
+                Stack<T> temp;
+                do
+                {
+                    std::cout << stack.getHead() << ' ';
+                    temp.push(stack.getHead());
+                    stack.pop();
+                } while (!stack.isEmpty());
+                std::cout << "\n";
+
+                do
+                {
+                    stack.push(temp.getHead());
+                    temp.pop();
+                } while (!temp.isEmpty());
+            }
+            return out;
+        }
     };
 }
 
