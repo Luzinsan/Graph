@@ -157,9 +157,8 @@ int main()
     }
     else std::cerr << "Ошибка открытия файла.";
 
-    
-   
-    Graph<int> Graph(AdjacencyLists);
+    Graph<int> graph(AdjacencyLists);
+    graph.Euler();
     return 0;
 }
 
