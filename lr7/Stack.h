@@ -1,5 +1,6 @@
 #pragma once
 #include <iostream>
+#include <vector>
 
 namespace luzinsan 
 {
@@ -68,6 +69,25 @@ namespace luzinsan
                 } while (!temp.isEmpty());
             }
             return out;
+        }
+
+        static std::vector<T> getPointerOnArray(Stack<T>& stack)
+        {
+            if (stack.getSize())
+            {
+                size_t size = stack.size;
+                std::vector<T> array;
+                for (unsigned i = 0; i < size; i++) 
+                {
+                    array.push_back(stack.getHead());
+                    stack.pop();
+                }
+               
+                for (int i = size-1; i >= 0; i--)
+                    stack.push(array[i]);
+                return array;
+            }
+            return std::vector<T>();
         }
     };
 }
