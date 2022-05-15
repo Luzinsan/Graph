@@ -1,9 +1,9 @@
 #pragma once
 #include <vector>
-
+#include <utility>
+#include <set>
 #include "ListNode.h"
 #include "Stack.h"
-
 
 namespace luzinsan
 {
@@ -19,7 +19,7 @@ namespace luzinsan
 				AdjacencyLists.push_back(List[i]);
 		}
 
-		void Euler() 
+		std::vector<T> Euler() 
 		{
 			Stack<T> stack1, stack2;
 			stack1.push(AdjacencyLists[0][0]);
@@ -39,18 +39,86 @@ namespace luzinsan
 					stack2.push(stack1.getHead());
 					stack1.pop();
 				}
-
-				std::cout << "\n\nИтерация[" << iter++ << "]: \n";
-				for (unsigned i = 0; i < AdjacencyLists.size(); i++)
-					std::cout << AdjacencyLists[i];
-
-				std::cout << "\nStack #1:\t";
-				Stack<T>::print(std::cout, stack1);
-				std::cout << "\nStack #2:\t";
-				Stack<T>::print(std::cout, stack2);
+				//std::cout << "\n\nИтерация[" << iter++ << "]: \n";
+				//for (unsigned i = 0; i < AdjacencyLists.size(); i++)
+				//	std::cout << AdjacencyLists[i];
+				//std::cout << "\nStack #1:\t";
+				//Stack<T>::print(std::cout, stack1);
+				//std::cout << "\nStack #2:\t";
+				//Stack<T>::print(std::cout, stack2);
 			}
+			return Stack<T>::getPointerOnArray(stack2);
 		}
+		
 	};
 
+	template <class T>
+	class Graph<std::pair<T, T>>
+	{
+	private:
+		std::vector<ListNode<std::pair<T,T>>> AdjacencyLists; // список смежностей
+	public:
+		Graph(const std::vector<ListNode<std::pair<T, T>>>& List)
+		{
+			for (unsigned i = 0; i < List.size(); i++)
+				AdjacencyLists.push_back(List[i]);
+		}
 
+		std::vector<std::pair<T, T>> Euler()
+		{
+			Stack<std::pair<T, T>> stack1, stack2;
+			stack1.push(AdjacencyLists[0][0]);
+			int iter = 0;
+			while (!stack1.isEmpty())
+			{
+				if (AdjacencyLists[stack1.getHead().first - 1].getSize() != 1)
+				{
+					std::pair<T,T> v = AdjacencyLists[stack1.getHead().first - 1][0];
+					std::pair<T, T> w = AdjacencyLists[stack1.getHead().first - 1][1];
+					stack1.push(w);
+					AdjacencyLists[v.first - 1].deleteNode(&AdjacencyLists[v.first - 1]);
+					AdjacencyLists[w.first - 1].deleteNode(AdjacencyLists[w.first - 1].find(v));
+				}
+				else
+				{
+					stack2.push(stack1.getHead());
+					stack1.pop();
+				}
+			}
+			return Stack<std::pair<T, T>>::getPointerOnArray(stack2);
+		}
+
+		std::vector<T> Dijkstra(T start) 
+		{
+			std::vector<T> shortestD;
+			for (int i = 0; i < AdjacencyLists.size(); i++)
+				shortestD.push_back(INT_MAX);
+		
+			shortestD[start - 1] = 0;
+			std::set<T> S_m, T_m;
+			S_m.insert(start);
+			T prev = start;
+			for (int i = 0; i < AdjacencyLists.size(); i++)
+				if(AdjacencyLists[i][0].first != start)
+					T_m.insert(AdjacencyLists[i][0].first);
+			
+			while (!T_m.empty())
+			{
+				T min_vertex = AdjacencyLists.size();
+				
+				for (auto& element : T_m) 
+				{
+					if(AdjacencyLists[prev - 1].find(element).second != INT_MAX)
+						shortestD[element-1] = std::min(shortestD[element - 1], 
+														shortestD[prev - 1] + AdjacencyLists[prev - 1].find(element).second);
+					if (shortestD[min_vertex - 1] > shortestD[element - 1]) min_vertex = element;
+
+				}
+				prev = min_vertex;
+				S_m.insert(prev); T_m.erase(prev);
+				std::cout << std::endl;
+			}
+			return shortestD;
+		}
+	};
 }
