@@ -287,14 +287,14 @@ namespace luzinsan
 		friend std::ostream& operator<<(std::ostream& out, const ListNode<std::pair<T, T>>& node)
 		{
 			const ListNode<std::pair<T, T>>* temp = &node;
-			std::cout << "_|" << temp->_info->first << "| -> ";
+			out << "_|" << temp->_info->first << "| -> ";
 			temp = temp->_next;
 			while (temp)
 			{
-				std::cout << '\'' << temp->_info->first  << "\': " << temp->_info->second << "\t -> ";
+				out << '\'' << temp->_info->first  << "\': " << temp->_info->second << "\t -> ";
 				temp = temp->_next;
 			}
-			std::cout << "NULL\n_|_\n";
+			out << "NULL\n_|_\n";
 			return out;
 		}
 		
