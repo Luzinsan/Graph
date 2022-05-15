@@ -102,21 +102,22 @@ namespace luzinsan
 				if(AdjacencyLists[i][0].first != start)
 					T_m.insert(AdjacencyLists[i][0].first);
 			
+			
 			while (!T_m.empty())
 			{
-				T min_vertex = AdjacencyLists.size();
-				
+				T min_vertex = *T_m.begin();
 				for (auto& element : T_m) 
 				{
+
 					if(AdjacencyLists[prev - 1].find(element).second != INT_MAX)
 						shortestD[element-1] = std::min(shortestD[element - 1], 
 														shortestD[prev - 1] + AdjacencyLists[prev - 1].find(element).second);
 					if (shortestD[min_vertex - 1] > shortestD[element - 1]) min_vertex = element;
 
 				}
+				if (shortestD[min_vertex - 1] == INT_MAX) break;
 				prev = min_vertex;
 				S_m.insert(prev); T_m.erase(prev);
-				std::cout << std::endl;
 			}
 			return shortestD;
 		}
