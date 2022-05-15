@@ -2,7 +2,10 @@
 #include <fstream>
 #include <conio.h>
 #include <vector>
+#include <string>
 #include <utility>
+#include <chrono>
+#include <thread>
 #include "Graph.h"
 /*
 4. Напишите программу, которая с помощью алгоритма Дейкстры 
@@ -15,12 +18,21 @@ char getSymbol(std::initializer_list<char> list,
     std::string notification_message = "",
     std::string error_message = "Недопустимое значение, попробуйте ещё раз.\n->");
 
+double getDouble(double min = DBL_MIN, 
+    double max = DBL_MAX, 
+    std::string notification_message = "",
+    std::string error_message = "Недопустимое значение, попробуйте ещё раз.\n->");
+
+std::ostream& counting(std::ostream& out);
+
+
 int main()
 {
     setlocale(LC_ALL, "Rus");
     std::cout << "\n\t Выберите задачу:"
         << "1 -> Найти Эйлеров путь в графе, заданном из файла (веса не задаются)(далее на выбор будут предложены способы задания графа в соответствии с файлом);"
         << "2 -> Найти кратчайшие расстояния от фиксированной вершины. Веса всех дуг в графе должны быть неотрицательны. Граф задаётся списками смежностей особым образом из файла Dijkstra.txt. (Dijkstra.readme.txt)";
+    
     char choice = getSymbol({ '1','2' }, "\n\n\tВыберите задачу:\n->");
     switch (choice)
     {
@@ -174,37 +186,44 @@ int main()
     case '2':
     {
         std::ifstream fin("Dijkstra.txt");
+        std::ofstream fout("outputDijkstra.txt");
         int numberOfVertices; // количество вершин
         fin >> numberOfVertices;
+
         std::vector<ListNode<std::pair<int, int>>> AdjacencyLists;
         for (unsigned i = 0; i < numberOfVertices; i++)
         {
             unsigned index, vertex, weight;
             fin >> index;
-            AdjacencyLists.push_back(ListNode<std::pair<int, int>>(std::pair<int,int>(index,0)));
+            AdjacencyLists.push_back(ListNode<std::pair<int, int>>(std::pair<int, int>(index, 0)));
             while (fin >> vertex >> weight && vertex != 0)
-                AdjacencyLists[index -1].append(std::pair<int, int>(vertex, weight));
+                AdjacencyLists[index - 1].append(std::pair<int, int>(vertex, weight));
         }
-        
+
         if (fin)
         {
-            std::cout << "\n\tСформированный список смежностей:\n";
+            fout << "\n\tСформированный список смежностей:\n";
             for (auto& element : AdjacencyLists)
-                std::cout << element;
+                fout << element;
         }
-        else std::cerr << "Ошибка открытия файла.";
-        
-        Graph<std::pair<int, int>> graph(AdjacencyLists);
-        std::vector<int> vec = graph.Dijkstra(1);
-        std::cout << "Кратчайшие расстояния, найденные алгоритмом Дейкстры: ";
-        for (int i = 0; i < AdjacencyLists.size(); i++)
-            std::cout << "\n\td[" << i + 1 << "] = " << vec[i] << ";";
-        
-        std::ofstream fout("outputDijkstra.txt");
-        std::cout << "Кратчайшие расстояния, найденные алгоритмом Дейкстры: ";
-        for (int i = 0; i < AdjacencyLists.size(); i++)
-            fout << "\n\td[" << i + 1 << "] = " << vec[i] << ";";
-        
+        else fout << "Ошибка открытия файла.";
+
+        unsigned fixed_vertex;
+        do
+        {
+            std::cout << std::endl;
+            fixed_vertex = getDouble(1, numberOfVertices, "\n\tВведите фиксированную вершину, от которой будут рассчитываться все остальные вершины: \n->");
+            
+            Graph<std::pair<int, int>> graph(AdjacencyLists);
+            std::vector<int> vec = graph.Dijkstra(fixed_vertex);
+            fout << "\n\n\tКратчайшие расстояния от вершины " << fixed_vertex << ", найденные алгоритмом Дейкстры: ";
+            for (int i = 0; i < AdjacencyLists.size(); i++)
+                fout << "\n\td[" << i + 1 << "] = " << vec[i] << ";";
+
+            counting(std::cout);
+            std::cout << "\n\tКратчайшие расстояния посчитаны.";
+            choice = getSymbol({ '1','2' }, "\n\tПродолжить?:\n\t1->да\n\t2->завершить\n->");
+        } while (choice == '1');
         break;
     }
     default:
@@ -231,4 +250,43 @@ char getSymbol(std::initializer_list<char> list,
         if (flag) std::cerr << error_message;
     } while (flag);
     return choice;
+}
+
+double getDouble(double min, double max, std::string notification_message, std::string error_message)
+{
+    std::string epsstr;
+    double eps;
+    do {
+        std::cout << notification_message;
+        std::cin >> epsstr;
+
+        bool point = false, flag = false;
+        auto it = epsstr.begin();
+        if (it[0] == '-') it++;
+        for (; it != epsstr.end(); it++)
+            if (!isdigit(it[0]) && (it[0] != ',' || point))
+            {
+                std::cout << error_message;
+                flag = true;
+                break;
+            }
+            else if (it[0] == ',' && !point) point = true;
+
+        if (flag) continue;
+        eps = std::stod(epsstr);
+        if (eps < min || eps > max)
+            std::cout << error_message;
+        else { std::cin.ignore(32256, '\n'); break; }
+    } while (true);
+    return eps;
+}
+
+std::ostream& counting(std::ostream& out)
+{
+    for (int i = 0; i < 10; i++) 
+    {
+        std::this_thread::sleep_for(std::chrono::milliseconds(500));
+        out << " . ";
+    }
+    return out;
 }
