@@ -56,11 +56,11 @@ namespace luzinsan
                 Stack<T> temp;
                 do
                 {
-                    std::cout << stack.getHead() << ' ';
+                    out << stack.getHead() << ' ';
                     temp.push(stack.getHead());
                     stack.pop();
                 } while (!stack.isEmpty());
-                std::cout << "\n";
+                out << "\n";
 
                 do
                 {
